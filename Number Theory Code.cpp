@@ -1,18 +1,41 @@
+
+
+/// divisor count from 1 to N /// here MAX = 10^7
+/// Extended Euclid , /// finds x and y , ax+by = gcd(a,b).
+/// Bigmod
+/// Find modinverse from 1 to N in O(n)
+/// Sieve of Erathosnes
+/// BITWISE SIEVE
+/// CountDiv()
+/// primeFactor()
+/// Segmented Sieve ,  find number of primes inside the range of A and B inclusive. Here, A,B≤10^12 and  B–A≤10^6
+/// Segmented Phi
+/// Find All prime between 2 : N in O(n)
+/// NOD , number of divisor of a number O(sqrt)
+/// SOD , sum over the divisor function. O(sqrt)
+/// Linear Diophantine Equation, Ax + By = C ( find x, y )
+/// Simple Hyperbolic Diophantine Equation ,  Axy + Bx + Cy = D
+/// Catalan number ( 1 1 2 5 14 42 132 429 1430 4862 )
+/// seive phi..for Precalculate
+/// single number phi in O(sqrt(n))
+/// binomial coefficient( NcR in O(r) )
+/// factorial inverse from 1 to MAXN in O(MAXN)
+/// n'th fibonacci
+/// prime count <= 10^11 /// Complexity for <= M , O(M^(3/4))
+/// prime count /// Complexity sqrt(n)
+/// count and print prime <= 5*10^8 ( 7104 ms )
+/// Radix sort
+/// Number base system
+/// digits in factorial N!
+/// prime factorization of N!
+/// Leading digits of N!
+/// Chinese Remainder Theorem , also another code Works for non-co-prime moduli
+
+
+
+
 #include<bits/stdc++.h>
 using namespace std;
-
-
-ll fact[N];
-void factorial () {
-    fact[0] = 1LL;
-    for (ll i = 1; i < N; ++i) fact[i] = modMul(fact[i - 1], i);
-}
-
-ll NcR (ll n, ll r) {
-    if (r > n) return 0LL;
-    return modDiv(fact[n], modMul(fact[n-r], fact[r]));
-}
-
 
 #define NN 1000005
 long total[1000005];
@@ -21,8 +44,42 @@ int prime[NN];
 int totalPrime;
 
 
+void div()
+{
+    for(int i=1; i<MAX; i++) /// here MAX = 10^7
+    {
+        for(int j=i+i; j<MAX; j=j+i)
+        {
+           /// i is a divisor of j
+           divisor[j]++;
+        }
+    }
+}
+
+
+/// Find All prime between 2 : N in O(n)
+/*
+
+const int N = 10000000;
+int lp[N+1];
+vector<int> pr;
+
+for (int i=2; i<=N; ++i) {
+    if (lp[i] == 0) {
+        lp[i] = i;
+        pr.push_back (i);
+    }
+    for (int j=0; j<(int)pr.size() && pr[j]<=lp[i] && i*pr[j]<=N; ++j)
+        lp[i * pr[j]] = pr[j];
+}
+*/
+
+
+/// x,y global
+/// It finds two integers x and y such that, ax+by = gcd(a,b).
 void extEuclid(int64 a, int64 b) {
-	if (b == 0) { x = 1; y = 0; d = a; return; }
+	if (b == 0)
+        { x = 1; y = 0; d = a; return; }
 	extEuclid(b, a % b);
 	x = x - (a / b) * y;
 	swap(x, y);
@@ -40,6 +97,17 @@ int bigmod(int n,int p,int m)
 
     return k;
 }
+
+/// Find modinverse from 1 to N in O(n)
+vector<int> inverseArray(int n, int m) {
+    vector<int> modInverse(n + 1,0);
+    modInverse[1] = 1;
+    for(int i = 2; i <= n; i++) {
+        modInverse[i] = (-(m/i) * modInverse[m % i]) % m + m;
+    }
+    return modInverse;
+}
+
 
 void sv()
 {
@@ -82,7 +150,9 @@ void sieve()
         if(!Check(prime[i>>5],i&31))
         {
             for(int j=i*i; j<=MAX; j+=(i<<1))
+            {
                 Set(prime[j>>5],j&31);
+            }
         }
     }
     primes.push_back(2);
@@ -143,10 +213,19 @@ void PHI(){
             }
         }
     }
-
 }
-
-
+int main()
+{
+	int i,j;
+   PHI();
+	int n;
+	while(scanf("%d",&n),n)
+	{
+		printf("%d\n",phi[n]);
+	    cout << (phi[n]/2)*n << endl; /// Sum of Co-prime Numbers of an Integer
+	}
+	return 0;
+}
 
 
 void primeFactor()
@@ -202,6 +281,40 @@ int segmentedSieve ( int a, int b ) {
     return res;
 }
 
+/// Segmented Phi
+const int SIZE = (int)1e5+1;     //define size to be max(B-A+1)
+ll r[SIZE];
+ll phi[SIZE];
+void segmented_phi(ll a, ll b){
+    for(int i = 0;i < SIZE; i++){
+        r[i] = a+i;
+        phi[i] = a+i;
+    }
+
+    for(int i = 0;i < primes.size(); i++){
+        int p = primes[i];
+        ll j = p;
+        if(j < a)    j = ((a+p-1)/p)*p;    //j = ceil(a/p)*p
+        for(; j <= b; j+=p){    //j is the smallest multiple of p
+            phi[j-a] /= p;
+            phi[j-a] *= (p-1);
+            while(r[j-a]%p == 0){
+                r[j-a]/=p;
+            }
+        }
+    }
+    for(ll i = a; i<= b; i++){
+        if(r[i-a] > 1){
+            phi[i-a] /= r[i-a];
+            phi[i-a] *= (r[i-a]-1);
+        }
+    }
+    for(ll i = a;i <= b; i++){
+      printf("%lld\n",phi[i-a]);
+    }
+    return;
+}
+
 
 /// Find All prime between 2 : N in O(n)
 /*
@@ -220,7 +333,30 @@ for (int i=2; i<=N; ++i) {
 }
 */
 
+/// number of divisor of a number O(sqrt)
+int NOD ( int n ) {
+    int sqrtn = sqrt ( n );
+    int res = 1;
+    for ( int i = 0; i < prime.size() && prime[i] <= sqrtn; i++ ) {
+        if ( n % prime[i] == 0 ) {
+            int p = 0; // Counter for power of prime
+            while ( n % prime[i] == 0 ) {
+                n /= prime[i];
+                p++;
+            }
+            sqrtn = sqrt ( n );
+            p++; // Increase it by one at end
+            res *= p; // Multiply with answer
+        }
+    }
+    if ( n != 1 ) {
+        res *= 2; // Remaining prime has power p^1. So multiply with 2/
+    }
+    return res;
+}
 
+
+/// sum of divisor of a single number O(sqrt)
 int SOD( int n ) {
     int res = 1;
     int sqrtn = sqrt ( n );
@@ -238,10 +374,114 @@ int SOD( int n ) {
         }
     }
     if ( n != 1 ) {
-        res *= ( n + 1 ); // Need to multiply (p^0+p^1)
+        res *= ( n + 1 ); /// Need to multiply (p^0+p^1)
     }
     return res;
 }
+
+
+/// The function CSOD(n) (cumulative SOD) of aninteger n, is defined as below:
+///  CSOD(n)=  { from(i=1 to n) SOD(i) }
+ll CSOD(int n)
+{
+    ll sum =0  ;
+    for(i=2;i<=sqrt(n);i++)
+    {
+        j = n/i;
+        sum += ((j*(j+1))-(i*(i-1)))/2;
+        sum += (j-i)*i;
+    }
+    cout<< sum << endl;
+}
+
+/// the divisor summatory function is a function that is a sum over the divisor function. O(sqrt)
+int SNOD( int n ) {
+    int res = 0;
+    int u = sqrt(n);
+    for ( int i = 1; i <= u; i++ ) {
+        res += ( n / i ) - i; //Step 1
+    }
+    res *= 2; //Step 2
+    res += u; //Step 3
+    return res;
+}
+
+
+/// Linear Diophantine Equation
+/// Ax + By = C ( find x, y )
+bool linearDiophantine ( int A, int B, int C, int *x, int *y ) {
+    int g = gcd ( A, B );
+    if ( C % g != 0 ) return false; //No Solution
+
+    int a = A / g, b = B / g, c = C / g;
+    ext_gcd( a, b, x, y ); //Solve ax + by = 1
+
+    if ( g < 0 ) { //Make Sure gcd(a,b) = 1
+        a *= -1; b *= -1; c *= -1;
+    }
+
+    *x *= c; *y *= c; //ax + by = c
+    return true; //Solution Exists
+}
+
+int main () {
+    int x, y, A = 2, B = 3, C = 5;
+    bool res = linearDiophantine ( A, B, C, &x, &y );
+
+    if ( res == false ) printf ( "No Solution\n" );
+    else {
+        printf ( "One Possible Solution (%d %d)\n", x, y );
+
+        int g = gcd ( A, B );
+
+        int k = 1; //Use different value of k to get different solutions
+        printf ( "Another Possible Solution (%d %d)\n", x + k * ( B / g ), y - k * ( A / g ) );
+    }
+
+ return 0;
+}
+
+
+
+/// Simple Hyperbolic Diophantine Equation
+/// Axy + Bx + Cy = D
+
+bool isValidSolution ( int a, int b, int c, int p, int div ) {
+    if ( ( ( div - c )% a ) != 0 ) return false; //x = (div - c) / a
+    if ( ( (p-b*div) % (a*div) ) != 0 ) return false;// y = (p-b*div) /(a*div)
+    return true;
+}
+
+int hyperbolicDiophantine ( int a, int b, int c, int d ) {
+    int p = a * d + b * c;
+
+    if ( p == 0 ) { //ad + bc = 0
+        if ( -c % a == 0 ) return -1; //Infinite solutions (-c/a, k)
+        else if ( -b % a == 0 ) return -1; //Infinite solutions (k, -b/a)
+        else return 0; //No solution
+    }
+    else {
+        int res = 0;
+
+        //For each divisor of p
+        int sqrtn = sqrt ( p ), div;
+        for ( int i = 1; i <= sqrtn; i++ ) {
+            if ( p % i == 0 ) { //i is a divisor
+                //Check if divisors i,-i,p/i,-p/i produces valid solutions
+                if ( isValidSolution(a,b,c,p,i) )res++;
+                if ( isValidSolution(a,b,c,p,-i) )res++;
+                if ( p / i != i ) { //Check whether p/i is different divisor than i
+                    if ( isValidSolution(a,b,c,p,p/i) )res++;
+                    if ( isValidSolution(a,b,c,p,-p/i) )res++;
+                }
+            }
+        }
+
+        return res; /// return number of solution exist
+    }
+}
+
+
 
 int catalan[MAX];
 void init() {
@@ -257,22 +497,12 @@ void init() {
     }
 }
 
-int main()
-{
-	int i,j;
-   PHI();
-	int n;
-	while(scanf("%d",&n),n)
-	{
-		printf("%d\n",phi[n]);
-	//	cout << (phi[n]/2)*n << endl;
-	}
-	return 0;
-}
+
 /// seive phi..
 ll phi[MAX];
 void seivePHI()
 {
+    /// phi[1] = 1;
     for(i = 2; i < MAX; i++)
     {
         if(phi[i] == 0)
@@ -280,8 +510,7 @@ void seivePHI()
             phi[i] = i - 1;
             for(j = i*2; j < MAX; j += i)
             {
-                if(phi[j] == 0)
-                    phi[j] = j;
+                if(phi[j] == 0) phi[j] = j;
                 phi[j] /= i;
                 phi[j] *= (i-1);
             }
@@ -334,22 +563,26 @@ ll phi(ll n)
 }
 
 
-int bc(int n, int k){
-    int i, j;
-    for (i = 0; i <= n; i++){
-        for (j = 0; j <=  k; j++){
-            if (j == 0 || j == i)
-                DP[i][j] = 1;
-
-            else
-                DP[i][j] = (DP[i-1][j-1]%M + DP[i-1][j]%M)%M;
-        }
+long long NCR(int n, int r) { /// O(r)
+    if(r > n - r) r = n - r; // because C(n, r) == C(n, n - r)
+    long long ans = 1;
+    for(i = 1; i <= r; i++) {
+        ans *= n - r + i; /// or ans *= n-i+1
+        ans /= i;
     }
+    return ans;
+}
+/// if N and R large but MOD value small we can find NcR in  O(MOD)
+ll fact_inv() /// O(n)
+{
+    fact[0 = inv[0] = 1;
+    for(i=1;i<maxn;i++) fact[i] = modMul(fact[i-1],i);
+    inv[maxn-1] = modPow(fact[maxn-1],MOD-2);
+    for(i=maxn-2;i>=1;i--)inv[i] = modMul(inv[i+1],i+1);
 }
 
 
 /// n'th fibonacci
-
 ll fib(ll n)
 {
     double phi = (1 + sqrt(5)) / 2;
@@ -455,6 +688,29 @@ int main(){
 }
 
 
+
+/// count and print prime <= 5*10^8 ( 7104 ms )
+bitset<500000009>sieve;
+vector<int>result;
+int main()
+{
+    long long N = 500000000, A, B;
+    int number_of_prime = -1;
+    for (int i = 2; i <= N; ++i)
+    {
+        if (sieve[i] == 0)
+        {
+            ++number_of_prime;
+            for (int j = i + i; j <= N; j+=i)
+                sieve[j] = 1;
+            result.push_back(i);
+        }
+    }
+    cout << result.size();
+}
+
+
+
 /// Radix sort
 
 int getMax(int arr[], int n)
@@ -507,3 +763,147 @@ void radixsort(int arr[], int n)
     for (int exp = 1; m / exp > 0; exp *= 10)
         countSort(arr, n, exp);
 }
+
+
+
+/// Number base system
+// A list of symbol. Depending on base and number system, this list can be different.
+char symbol[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+string decimalToBase ( int x, int base ) {
+    string res = "";
+
+    while ( x ) {
+        int r = x % base; // Find the last digit
+        res = res + symbol[r]; // Change the integer value to symbol and append to res
+        x /= base; // Remove the last digit
+    }
+    if ( res == "" ) res = symbol[0]; // If res is empty, that means x is 0.
+    reverse ( res.begin(), res.end()); // We found the digits in reverse order.
+    return res;
+}
+
+
+/// digits in factorial N
+int factorialDigitExtended ( int n, int base ) {
+    double x = 0;
+    for ( int i = 1; i <= n; i++ ) {
+        x += log10 ( i ) / log10(base); // Base Conversion
+    }
+    int res = x + 1 + eps;
+    return res;
+}
+
+/// prime factorization of N!
+void factFactorize ( int n ) {
+    for ( int i = 0; i < prime.size() && prime[i] <= n; i++ ) {
+        int x = n;
+        int freq = 0;
+
+        while ( x / prime[i] ) {
+            freq += x / prime[i];
+            x = x / prime[i];
+        }
+
+        printf ( "%d^%d\n", prime[i], freq );
+    }
+}
+
+/// Leading digits of N!
+
+const double eps = 1e-9;
+/// Find the first K digits of N!
+int leadingDigitFact ( int n, int k ) {
+    double fact = 0;
+
+    /// Find log(N!)
+    for ( int i = 1; i <= n; i++ ) {
+        fact += log10 ( i );
+    }
+
+    /// Find the value of q
+    double q = fact - floor ( fact+eps );
+
+    double B = pow ( 10, q );
+
+    /// Shift decimal point k-1 \times
+    for ( int i = 0; i < k - 1; i++ ) {
+        B *= 10;
+    }
+
+    /// Don't forget to floor it
+    return floor(B+eps);
+}
+
+
+/// Chinese Remainder Theorem
+/** Return {-1,-1} if invalid input.
+    Otherwise, returns {x,L}, where x is the solution unique to mod L
+*/
+pair<int, int> chinese_remainder_theorem( vector<int> A, vector<int> M ) {
+    if(A.size() != M.size()) return {-1,-1}; /** Invalid input*/
+
+    int n = A.size();
+
+    int a1 = A[0];
+    int m1 = M[0];
+    /** Initially x = a_0 (mod m_0)*/
+
+    /** Merge the solution with remaining equations */
+    for ( int i = 1; i < n; i++ ) {
+        int a2 = A[i];
+        int m2 = M[i];
+
+        /** Merge the two equations*/
+        int p, q;
+        ext_gcd(m1, m2, &p, &q);
+
+        /** We need to be careful about overflow, but I did not bother about overflow here to keep the code simple.*/
+        int x = (a1*m2*q + a2*m1*p) % (m1*m2);
+
+        /** Merged equation*/
+        a1 = x;
+        m1 = m1 * m2;
+    }
+    if (a1 < 0) a1 += m1; /** Result is not suppose to be negative*/
+    return {a1, m1};
+}
+
+
+/** Works for non-coprime moduli.
+ Returns {-1,-1} if solution does not exist or input is invalid.
+ Otherwise, returns {x,L}, where x is the solution unique to mod L
+*/
+pair<int, int> chinese_remainder_theorem( vector<int> A, vector<int> M ) {
+    if(A.size() != M.size()) return {-1,-1}; /** Invalid input*/
+
+    int n = A.size();
+
+    int a1 = A[0];
+    int m1 = M[0];
+    /** Initially x = a_0 (mod m_0)*/
+
+    /** Merge the solution with remaining equations */
+    for ( int i = 1; i < n; i++ ) {
+        int a2 = A[i];
+        int m2 = M[i];
+
+        int g = __gcd(m1, m2);
+        if ( a1 % g != a2 % g ) return {-1,-1}; /** No solution exists*/
+
+        /** Merge the two equations*/
+        int p, q;
+        ext_gcd(m1/g, m2/g, &p, &q);
+
+        int mod = m1 / g * m2; /** LCM of m1 and m2*/
+
+        /** We need to be careful about overflow, but I did not bother about overflow here to keep the code simple.*/
+        int x = (a1*(m2/g)*q + a2*(m1/g)*p) % mod;
+
+        /** Merged equation*/
+        a1 = x;
+        if (a1 < 0) a1 += mod; /** Result is not suppose to be negative*/
+        m1 = mod;
+    }
+    return {a1, m1};
+}
+

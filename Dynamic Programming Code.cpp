@@ -1,17 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-/// Longest Increasing Subsequence NlogN
-multiset < int > s;
-multiset < int > :: iterator it;
-FOR(i, 1, n)
-{
-    s.insert(a[i]);
-    it = s.upper_bound(a[i]);
-    if(it != s.end())
-        s.erase(it);
-}
-cout << s.size() << endl;
+
 
 /// LCS + LIS ( also with print ) for duplicate value
 
@@ -269,29 +259,6 @@ int main()
 }
 
 
-/*
-set    N=N | (1<<pos)
-reset  (N & (1<<pos))
-clear  number &= ~(1UL << n)
-toggle number ^= 1UL << n
-changing nth bit to x(0,1) number ^= (-x ^ number) & (1UL << n)
-is power of 2 : x && (!(x&(x-1)))
-int bitmask(int r,int mask)
-{
-    if(r>=n)    return 0;
-    if(dp[r][mask]!=-1)    return dp[r][mask];
-    int mx=0;
-    for(int i=0;i<n;i++)
-    {
-        if(check(mask,i)==0)
-        {
-           int ans=a[r][i]+bitmask(r+1,Set(mask,i));
-           mx=max(mx,ans);
-        }
-    }
-    return dp[r][mask]=mx;
-}
-*/
 unsigned int nextPowerOf2(unsigned int n)
 {
     n--;n |= n >> 1;n |= n >> 2;
@@ -423,134 +390,6 @@ int main()
       int ans =  solve(0,0,0) - 1; /// 000 not countable
 }
 
-
-/// Maximum Increasing sum O(NlogN)
-
-vector<ll>tree(4*mx,0);
-long long Query( int node, int b, int e, int i, int j)
-{
-    if( b >= i && e <= j)
-        return tree[node];
-    if( j<b || i>e )
-        return 0;
-
-    int Left = node*2;
-    int Right = node*2+1;
-    int mid  = (b+e)/2;
-    long long p1 = Query( Left, b, mid, i,j);
-    long long p2 = Query( Right, mid+1, e, i,j);
-    return max(p1,p2);
-}
-void Update( int node, int b, int e, int i, int j,ll newvalue)
-{
-    if( b >= i && e <= j)
-    {
-        tree[node] = max(tree[node],newvalue);
-        return ;
-    }
-    if( j<b || i>e )
-        return ;
-
-    int Left = node*2;
-    int Right = node*2+1;
-    int mid  = (b+e)/2;
-    Update( Left, b, mid, i,j,newvalue);
-    Update( Right, mid+1, e, i,j,newvalue);
-    tree[node] = max(tree[Left],tree[Right]);
-}
-int main()
-{
-      cin >> n;
-      f0(i,n)
-          cin >> val[i];
-      Max = 0;
-      for(int i=0;i<n;i++)
-      {
-          ll value = Query(1,0,n-1,0,val[i]-1);
-          Update(1,0,n-1,val[i]-1,val[i]-1,value+val[i]);
-          Max = max(Max,val[i]+value);
-      }
-      cout << Max << ln;
-}
-
-
-/// Longest increasing subsequence ( with Query )
-
-int bit[N],n;
-void update(int i,int val)
-{
-	while(i<=n)
-	{
-		bit[i]=max(bit[i],val);
-		i=i+(i&(-i));
-	}
-}
-int query(int i)
-{
-	int ret=0;
-	while(i)
-	{
-		ret=max(ret,bit[i]);
-		i=i-(i&(-i));
-	}
-	return ret;
-}
-vector<int> v[N];
-int last[N],maxx[N],a[N];
-int Out[N];
-vector<pair<int,int> > Q[N];
-void update_DAG(int cur,int val)
-{
-	if(val>maxx[cur])
-	{
-		for(auto x:v[cur])
-			update_DAG(x,val+1);
-		maxx[cur]=val;
-		update(cur,val);
-	}
-}
-int main()
-{
-	int t;
-	sd(t);
-	while(t--)
-	{
-		int q,i,j;
-		sd(n);sd(q);
-		for(i=0;i<=n;i++)
-		{
-			maxx[i]=last[i]=bit[i]=0;
-			v[i].clear();
-			Q[i].clear();
-		}
-		for(i=1;i<=n;i++)
-		{
-			sd(a[i]);
-			last[a[i]]=i;
-			int prev=0;
-			for(j=a[i]-1;j>=1;--j)
-				if(last[j]>prev)
-				{
-					prev=last[j];
-					v[last[j]].PB(i);
-				}
-		}
-		for(i=0;i<q;i++)
-		{
-			int x,y;
-			sd(x);sd(y);
-			Q[x].PB(MP(y,i));
-		}
-		for(i=n;i>=1;--i)
-		{
-			update_DAG(i,1);
-			for(j=0;j<Q[i].size();j++)
-				Out[Q[i][j].S]=query(Q[i][j].F);
-		}
-		for(i=0;i<q;i++)
-			printf("%d\n",Out[i]);
-	}
-}
 
 
 

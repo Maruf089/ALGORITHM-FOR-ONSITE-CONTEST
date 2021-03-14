@@ -1,38 +1,3 @@
-#include <bits/stdc++.h>
-#define pb push_back
-using namespace std;
-vector <int> v[10] ;
-deque <int > Q;
-int distance[500];
-void bfs(int start)
-{
-    Q.push_back(start);
-    distance[0] = 0;
-    while( !Q.empty ())
-    {
-        int v = Q.front( );
-        Q.pop_front();
-        for( int i = 0 ; i < edges[v].size(); i++)
-        {
-
-            if(distance[ edges[ v ][ i ].first ] > distance[ v ] + edges[ v ][ i ].second )
-            {
-
-                distance[ edges[ v ][ i ].first ] = distance[ v ] + edges[ v ][ i ].second;
-
-                /*if edge weight between v and its neighbour is 0 then push it to front of
-                double ended queue else push it to back*/
-
-                if(edges[ v ][ i ].second == 0)
-                    Q.push_front( edges[ v ][ i ].first);
-                else
-                    Q.push_back( edges[ v ][ i ].first);
-            }
-        }
-    }
-}
-
-
 #define MAX_VERTEX 1000  // Maximum number of nodes a graph can have.
 vector<int>G[MAX_VERTEX];// This basically is an array of Vector,
 int color[MAX_VERTEX];
@@ -155,7 +120,7 @@ void Dijkstra(int source, int n)
     }
 }
 
-int main() //Driver Function for Dijkstra SSSP
+int main() ///Driver Function for Dijkstra SSSP
 {
     int n,m,x,y,w;//Number of vertices and edges
     //cout<<"Enter number of vertices and edges in the graph\n";
@@ -176,9 +141,6 @@ int main() //Driver Function for Dijkstra SSSP
         cout<<"Vertex: "<<i<<" , Distance: ";
         dis[i]!=INF? cout<<dis[i]<<"\n" : cout<<"-1\n";
     }
-
-
-    return 0;
 }
 
 
@@ -543,44 +505,27 @@ void Graph::AP()
 
 
 /// Topological Sort
-
-typedef vector<int> vi;
-vi topSort(vector<int>graph[]){
-
-	int inorder[n+1];
-	memset(inorder, 0 , sizeof(inorder));
-	for(int i=1; i<=n; i++){
-		for(int j=0 ; j<(int)graph[i].size() ; j++){
-			int id = graph[i][j];
-			inorder[id]++;
-		}
-	}
-
-	queue< int > q;
-	vector<int> order;
-
-	for(int i=1 ; i<=n; i++){
-		if(!inorder[i]){
-			q.push(i);
-		}
-	}
-
-	while(!q.empty()){
-		int u = q.front();
-		q.pop();
-		order.push_back(u);
-		for(int i=0 ; i<(int)graph[u].size() ; i++){
-			int v = graph[u][i];
-			inorder[v]--;
-			if(inorder[v]==0) q.push(v);
-		}
-	}
-
-	return order;
+void dfs(int v) {
+    visited[v] = true;
+    for (int u : adj[v]) {
+        if (!visited[u])
+            dfs(u);
+    }
+    ans.push_back(v);
 }
 
-/// Warshall
+void topological_sort() {
+    visited.assign(n, false);
+    ans.clear();
+    for (int i = 0; i < n; ++i) {
+        if (!visited[i])
+            dfs(i);
+    }
+    reverse(ans.begin(), ans.end());
+}
 
+
+/// Warshall
 #define V 4
 #define INF 99999
 void floydWarshall (int graph[][V])

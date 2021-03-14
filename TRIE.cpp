@@ -1,66 +1,69 @@
 /// max,min x-or sum for an array LOJ 1269
-struct node
-{
-    int lft, rgt;
-    node()
-    {lft=rgt=-1;}
-};
-node tree[3500000];
-int nodeNum;
 
-void Insrt(int x)
+
+int tree[mx*32][2];
+int cnt[mx*32][2];
+int nodeNum;
+void Init()
 {
-    int pos=0, bit;
+    nodeNum = 0 ;
+    tree[0][0] = tree[0][1] = 0;
+}
+void Insrt(ll x)
+{
+    ll pos=0, bit;
     for(int i=31; i>=0; i--)
     {
         bit = (x>>i)&1;
         if(bit)
         {
-            if(tree[pos].rgt==-1)
+            if(tree[pos][1] == 0)
             {
-                tree[pos].rgt=++nodeNum;
-                tree[nodeNum]=node();
+                tree[pos][1] = ++nodeNum;
+                MEM(tree[nodeNum],0);
             }
-            pos=tree[pos].rgt;
+            cnt[pos][1]++;
+            pos = tree[pos][1];
         }
         else
         {
-            if(tree[pos].lft==-1)
+            if(tree[pos][0] == 0 )
             {
-                tree[pos].lft=++nodeNum;
-                tree[nodeNum]=node();
+                tree[pos][0] = ++nodeNum;
+                MEM(tree[nodeNum],0);
             }
-            pos=tree[pos].lft;
+            cnt[pos][0]++;
+            pos = tree[pos][0];
         }
     }
     return;
 }
 
-int Qry_max(int x)
+ll Qry_max(ll x)
 {
-    int pos=0, bit, res=0;
+    ll pos=0, bit , res = 0;
     for(int i=31; i>=0; i--)
     {
         bit = (x>>i)&1;
         if(bit)
         {
-            if(tree[pos].lft!=-1)
+            if(tree[pos][0]!=0 and cnt[pos][0]>0)
             {
                 res |= (1<<i);
-                pos = tree[pos].lft;
+                pos = tree[pos][0];
             }
             else
-                pos=tree[pos].rgt;
+                pos = tree[pos][1];
         }
         else
         {
-            if(tree[pos].rgt!=-1)
+            if(tree[pos][1]!=0 and cnt[pos][1]>0)
             {
                 res |= (1<<i);
-                pos=tree[pos].rgt;
+                pos = tree[pos][1];
             }
             else
-                pos=tree[pos].lft;
+                pos = tree[pos][0];
         }
     }
     return res;
@@ -74,27 +77,48 @@ int Qry_min(int x)
         bit = (x>>i)&1;
         if(bit==0)
         {
-            if(tree[pos].lft!=-1)
-                pos = tree[pos].lft;
+            if(tree[pos][0]!=0)
+                pos = tree[pos][0];
             else
             {
                 res |= (1<<i);
-                pos=tree[pos].rgt;
+                pos=tree[pos][1];
             }
         }
         else
         {
-            if(tree[pos].rgt!=-1)
-                pos=tree[pos].rgt;
+            if(tree[pos][1]!=-1)
+                pos=tree[pos][1];
             else
             {
-                pos=tree[pos].lft;
+                pos=tree[pos][0];
                 res |= (1<<i);
             }
         }
     }
     return res;
 }
+
+void Delete(ll a)
+{
+    ll pos = 0 , bit;
+    for(int i=31; i>=0; i--)
+    {
+         bit = (a>>i)&1;
+         if(bit)
+         {
+             cnt[pos][1]--;
+             pos = tree[pos][1];
+         }
+         else
+         {
+             cnt[pos][0]--;
+             pos = tree[pos][0];
+         }
+    }
+    return;
+}
+
 
 int main()
 {
@@ -106,7 +130,7 @@ int main()
         cin>>n;
         nodeNum=mx=cumxor=0,mn=INT_MAX;
 
-        tree[0] = node();
+        Init();
         Insrt(0);
         for(int i=0; i<n; i++)
         {
@@ -173,42 +197,5 @@ int search(string s)
 
 
 
-/// using pointer
-struct node
-{
-    node* next[2];
-    node()
-    {
-        next[0]=next[1]=NULL;
-    }
-}*root;
-void insert(int x)
-{
-    node* cur=root;
-    int b;
-    for(int i=20; i>=0; i--)
-    {
-        b = (x>>i)&1;
-        if(cur->next[b]==NULL)
-            cur->next[b]=new node();
-        cur=cur->next[b];
-    }
-}
-int get_min(int x)
-{
-    node* cur=root;
-    int k,ans=0;
-    for(int i=20; i>=0; i--)
-    {
-        k = (x>>i)&1;
-        if(cur->next[k])
-            cur=cur->next[k],ans<<=1;
-        else
-            cur=cur->next[!k],ans<<=1,ans++;
-    }
-    return ans;
-}
-int main()
-{
-    root = new node();
-}
+
+
